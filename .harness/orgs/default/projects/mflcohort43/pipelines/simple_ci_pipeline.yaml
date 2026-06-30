@@ -1,0 +1,44 @@
+pipeline:
+  name: simple_ci_pipeline
+  identifier: simple_ci_pipeline
+  projectIdentifier: mflcohort43
+  orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: project_level_github_connector
+        repoName: mission4
+        build: <+input>
+  stages:
+    - stage:
+        name: build_stage
+        identifier: build_stage
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          caching:
+            enabled: true
+            override: true
+          buildIntelligence:
+            enabled: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: dan_builld_farm_connector
+              namespace: harness-delegate-ng
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: run_script
+                  identifier: run_script
+                  spec:
+                    connectorRef: project_level_dockerhub_connector
+                    image: bash
+                    shell: Bash
+                    command: sh run.sh
